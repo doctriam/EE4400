@@ -1,0 +1,56 @@
+\documentclass{article}
+
+\title{Notes: Anwani 10/2018}
+\date{2019-02-03}
+\author{Kenneth Haynie, Jr}
+
+\begin{document}
+    \pagenumbering{arabic}
+    \maketitle
+    \setcounter{section}{2}
+        \section{Spiking Neurons}
+            \subsection{Synapse}
+                \begin{equation}
+                    i(t) = w \alpha(t-t^f)
+                \end{equation}
+                \begin{itemize}
+                    \item $i(t)$: \textbf{analog current signal received by
+                    post-synaptic neuron}; linear and time-invariant
+                    \item $w\alpha(t)$: transfer function
+                    \item $w$: 
+                    \begin{itemize}
+                        \item synaptic weight representing conductance across
+                        a synapse connecting two neurons
+                        \item also known as the scaling factor
+                        \item varies from synapse to synapse
+                        \item can be positve or negative depending on ``\textbf{which
+                            the synapse} is said to be excitatory or inhibitory
+                        respectively"
+                    \end{itemize}
+                    \item $\alpha(t)$: post-synaptic current kernel;
+                    independent of synapse
+                    \item $t^f$: time at which pre-synaptic neuron issues a
+                    spike; firing time
+                    \item assume synaptic currents are independent of membrane or reversal
+                    potential of post-synaptic neuron
+                \end{itemize}
+                \hfill\break
+                \begin{equation}
+                    \alpha(t)=[\exp(-t/\tau_1)-\exp(-t/\tau_2)]u(t)
+                \end{equation}
+                \begin{itemize}
+                    \item $\tau_1 > \tau_2$
+                    \item $\tau_1$ and $\tau_2$: \textbf{unspecified in document}
+                    \item $u(t)$: Heaviside function; models the incoming spike
+                \end{itemize}
+                \hfill\break
+                \begin{equation}
+                    c_i(t)=\sum_{f}\alpha(t-t^i_f)=\sum_{i}\delta(t-t^i_f)\ast[e^{-t/\tau_1}-e^{-t/\tau_2}]
+                \end{equation}
+                \begin{itemize}
+                    \item $i$: represents specific synapse
+                    \item $t^i_f$: (\textit{most likely}) pre-synaptic firing time of
+                    individual spikes across the specified synapse
+                    \item $t$: 
+                \end{itemize}
+\end{document}
