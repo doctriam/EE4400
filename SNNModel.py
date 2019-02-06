@@ -15,18 +15,17 @@ import sys
 CURSOR_UP='\x1b[1A'
 ERASE_LINE='\x1b[2K'
 
+# Shared Parameters
+tmax=1000 # time range
+dt=0.5 # step size
+E_L=-65 # membrane resting potential
+b=0.2 # sensitivity; unknown origin for value
+Iapp=10 # applied current
+tr=array([200.,700])/dt # stm time
+T=int(ceil(tmax/dt))
+
 def main_menu():
     global tmax,dt,n,E_L,b,Iapp,tr,T
-
-    # Shared Parameters
-    tmax=1000 # time range
-    dt=0.5 # step size
-    n=1000 # number of neurons for multi-neuron functions
-    E_L=-65 # membrane resting potential
-    b=0.2 # sensitivity; unknown origin for value
-    Iapp=10 # applied current
-    tr=array([200.,700])/dt # stm time
-    T=int(ceil(tmax/dt))
 
     # List of functions
     print("1. Neuron Model")
@@ -148,14 +147,14 @@ def synapse_model():
     return
 
 def excit_inhib():
-    tmax=1000 # time range
-    dt=0.5 # step size
+#    tmax=1000 # time range
+#    dt=0.5 # step size
     n=1000 # number of neurons for multi-neuron functions
-    E_L=-65 # membrane resting potential
-    b=0.2 # sensitivity; unknown origin for value
-    Iapp=10 # applied current
-    tr=array([200.,700])/dt # stm time
-    T=int(ceil(tmax/dt))
+#    E_L=-65 # membrane resting potential
+#    b=0.2 # sensitivity; unknown origin for value
+#    Iapp=10 # applied current
+#    tr=array([200.,700])/dt # stm time
+#    T=int(ceil(tmax/dt))
     pinh=0.2 # probability of inhibited neuron
     inh=(uniform(size=n)<pinh) # whether inhibited
     exc=logical_not(inh) # whether excitatory
@@ -215,6 +214,7 @@ def excit_inhib():
     show()
 
 def recurrent_network():
+    n=1000 # number of neurons for multi-neuron functions
     pinh=0.2
     inh=(uniform(size=n)<pinh)
     exc=logical_not(inh)
@@ -288,13 +288,14 @@ def recurrent_network():
     plot(tspk[idx_i]*dt,nspk[idx_i],'r.',
          label='Inh.',markersize=2)
     xlabel('Time[ms]')
-    ylabel('neuronnumber[\#]')
+    ylabel('Neuron number[\#]')
     xlim((0,tmax))
     title("""A recurrent network of %d qIF neurons""" % n)
     legend(loc='upper right')
     show()
 
 def ring_structure():
+    n=1000 # number of neurons for multi-neuron functions
     pinh=0.2
     inh=(uniform(size=n)<pinh)
     exc=logical_not(inh)
@@ -374,7 +375,7 @@ def ring_structure():
     plot(tspk[idx_i]*dt,nspk[idx_i],'r.',
          label='Inh.',markersize=2)
     xlabel('Time[ms]')
-    ylabel('neuronnumber[\#]')
+    ylabel('Neuron number[\#]')
     xlim((0,tmax))
     title("""A recurrent network of %d qIF neurons""" % n)
     legend(loc='upper right')
