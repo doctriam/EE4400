@@ -1,52 +1,61 @@
-##############################################################################
-# TITLE:  Shruti Kulkarni Synapse Model
-# DESCRIPTION:  https://arxiv.org/pdf/1711.03637.pdf - Section II
-# VERSION:  1.0
-# VERSION NOTES:
-#     ""
-# AUTHOR:  Kenny Haynie
-##############################################################################
+#!/usr/bin/python
+"""
+Title: "Learning and Real-time Classification of Hand-written Digits with
+    Spiking Neural Networks"
+Original Author: Shruti Kulkarni
+Python Author: Kenny Haynie
+"""
 
-from numpy import *
+import numpy
 import matplotlib.pyplot as plt
 
-def membrane_potential():
-    # Section II - Equation (1)
-    # Evolution of membrane potential, V_m(t):
-    # C*(dV_m(t)/dt)=-g_L(V_m(t)-E_L)+I(t)
-    C=300e-12 # membrane capacitance in (pico)Farads
-    g_L=30e-9 # membrane leak conductance in (nano)Siemens
-    E_L=0 # leak reversal potential
+t_sim = 0.1 # simulation time in seconds
+dt = 0.1e-3 # time step in (milli)seconds
+M = round(t_sim/dt) # number of points in t_array
+t_ref = 3e-3 # reference time
+t = numpy.arange(0.0, t_sim, dt) # time array
 
-    # Membrane potential in (milli)Volts
-    # Value range pulled from Anwani 10/2018
-#    V_m=random.random_sample(105)*(-0.1)
-#
-#    plt.plot(V_m)
-#    plt.ylabel('test')
-#    plt.xlabel('t')
-#    plt.show()
-    return
+# Neuron Parameters
+C = 300e-12 # membrane capacitance in Farads
+gL = 30e-9 # membrane leak conductance in Siemens
+EL = -70e-3 # resting potential in Volts
+VT = 20e-3 # threshold potential in Volts
 
-def post_synaptic_current():
-    # k=input neuron, l=output neuron
-    w_kl=1 # synaptic weight currently uncalculated
+# Input Pixels
+N_pixel = 256 # number of pixels
+pix = numpy.arange(0, N_pixel) # 1-D array from 0 to 256
+#pix = numpy.random.rand(1, 256)*N_pixel # randomized 1-D array from 0 to 256
+w = 1.012e-10 # pixel weight
+Ic = 2.7e-9 # minimum current for neuron to spike
+Vm = numpy.zeros((N_pixel, M)) # zero array to hold Vm values
+Y_spk = numpy.zeros((N_pixel, M)) # zero array to hold signum values
+isref_n = numpy.zeros((N_pixel)) # last spike time array: see Eq. 10
+I_in = Ic+pix*w # input current; Equation 6
 
-    tau_1=5e-3 # represents synaptic kernel time
-    tau_2=1.25e-3 # represents synaptic kernel time
+for i in range(0, M-1):
+    k1 = (1/C)*(I_in-(gL*(Vm[:, i]-EL))) # Equation 7
+    k2 = (1/C)*(I_in-(gL*(Vm[:, i]+(k1*dt)-EL))) # Equation 8
+    Vm[:, i+1] = Vm[:, i]+(dt*(k1+k2)/2) # Equation 9
+    Vm[numpy.where(t[i]-isref_n < t_ref), i+1] = EL
+    spind = numpy.sign(Vm[:, i+1]-VT) # find sign of difference b/t Vm and VT
+    Vm[Vm[:, i+1] < EL, i+1] = EL # correct for under resting potential
 
-    c_k=0 # base
+    # Perform if over threshold
+    if max(spind) > 0:
+        resetfind_n = numpy.where(spind > 0) # find where Vm > VT
+        isref_n[resetfind_n] = t[i] # mark time of reset
+        Vm[resetfind_n, i] = VT # Set Vm to threshold
+        Y_spk[resetfind_n, i] = 1 # Mark boolean true for spike at t[i]
 
-def pixel_current():
-    k=random.randint(0,255) # pixel value
-    I_p=101.2e-12 # scaling factor
-    I_0=2.7e-9 # minimum current above which LIF neuron can generate a spike
+[x, y] = numpy.where(Y_spk) # find where spike occured
+plot1 = plt.plot(y/10, x, 'o') # convert y to ms
+plt.title('Neuron Spike Trains')
+plt.xlabel('Time (ms)')
+plt.ylabel('Pixel Value')
+plt.show()
 
-    # Equation (4)
-    # - current applied to neuron
-    i_k = I_0 + k*I_p
-
-    print("Pixel Current i(k) = %s nA" % (i_k*10**9))
-    return
-
-pixel_current()
+spk_cnt = numpy.sum(Y_spk, axis=1)
+spk_freq = spk_cnt/t_sim
+plot2 = plt.plot(spk_freq)
+plt.title('Spike Frequency vs Pixel Values')
+plt.show()
